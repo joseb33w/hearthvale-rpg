@@ -261,7 +261,7 @@ func _build_room(root: Node, size: float, rec: Dictionary) -> NavigationRegion3D
 	var nav := NavigationRegion3D.new()
 	var nm := NavigationMesh.new()
 	nm.agent_radius = 0.5
-	nm.agent_height = 1.7
+	nm.agent_height = 1.75
 	nm.cell_size = 0.25
 	nm.cell_height = 0.25
 	nm.geometry_parsed_geometry_type = NavigationMesh.PARSED_GEOMETRY_STATIC_COLLIDERS
