@@ -34,7 +34,7 @@ var knight: Node3D
 var hero_anim: AnimationPlayer
 var _hero_state := ""
 var cam: Camera3D
-const CAM_OFFSET := Vector3(0, 11.5, 11.0)
+const CAM_OFFSET := Vector3(0, 14.0, 9.0)
 var swing_t := 0.0
 var _shake_t := 0.0
 
@@ -447,8 +447,9 @@ func _build_env() -> void:
 	env = Environment.new()
 	env.background_mode = Environment.BG_SKY
 	env.tonemap_mode = Environment.TONE_MAPPER_ACES
-	env.tonemap_exposure = 1.0
+	env.tonemap_exposure = 0.82
 	env.ambient_light_source = Environment.AMBIENT_SOURCE_SKY
+	env.ambient_light_energy = 0.6
 	env.fog_enabled = true
 	env.fog_light_color = Color(0.7, 0.76, 0.86)
 	env.fog_density = 0.01
@@ -472,7 +473,7 @@ func _make_sky(path: String) -> Sky:
 	var tex = load(path)
 	if tex:
 		sm.panorama = tex
-	sm.energy_multiplier = 1.0
+	sm.energy_multiplier = 0.5
 	sky.sky_material = sm
 	return sky
 
@@ -543,7 +544,7 @@ func _apply_outline(root: Node3D, width: float) -> void:
 
 func _build_camera() -> void:
 	cam = Camera3D.new()
-	cam.fov = 58.0
+	cam.fov = 56.0
 	cam.position = CAM_OFFSET
 	add_child(cam)
 
@@ -559,7 +560,8 @@ func _update_camera(delta: float) -> void:
 		q.exclude = [player.get_rid()]
 		var hit := space.intersect_ray(q)
 		if hit:
-			target = (hit.position as Vector3) + (base - target).normalized() * 0.6
+			var hd := maxf(base.distance_to(hit.position as Vector3) - 0.4, 7.0)
+			target = base + (target - base).normalized() * hd
 	var shake := Vector3.ZERO
 	if _shake_t > 0.0:
 		_shake_t = max(0.0, _shake_t - delta)
@@ -698,13 +700,13 @@ func _build_overlay() -> void:
 	bg.mouse_filter = Control.MOUSE_FILTER_STOP
 	overlay.add_child(bg)
 	var vb := VBoxContainer.new()
-	vb.set_anchors_preset(Control.PRESET_CENTER)
+	vb.set_anchors_preset(Control.PRESET_FULL_RECT)
 	vb.alignment = BoxContainer.ALIGNMENT_CENTER
-	vb.add_theme_constant_override("separation", 14)
+	vb.add_theme_constant_override("separation", 16)
 	bg.add_child(vb)
 	var title := Label.new()
 	title.text = "HEARTHVALE"
-	title.add_theme_font_size_override("font_size", 64)
+	title.add_theme_font_size_override("font_size", 54)
 	title.add_theme_color_override("font_color", Color(0.95, 0.85, 0.55))
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	vb.add_child(title)
@@ -736,12 +738,13 @@ func _build_overlay() -> void:
 	vbg.set_anchors_preset(Control.PRESET_FULL_RECT)
 	victory.add_child(vbg)
 	var vv := VBoxContainer.new()
-	vv.set_anchors_preset(Control.PRESET_CENTER)
+	vv.set_anchors_preset(Control.PRESET_FULL_RECT)
 	vv.alignment = BoxContainer.ALIGNMENT_CENTER
+	vv.add_theme_constant_override("separation", 16)
 	vbg.add_child(vv)
 	var vt := Label.new()
 	vt.text = "THE SEAL IS BROKEN"
-	vt.add_theme_font_size_override("font_size", 56)
+	vt.add_theme_font_size_override("font_size", 48)
 	vt.add_theme_color_override("font_color", Color(1.0, 0.86, 0.45))
 	vt.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	vv.add_child(vt)
