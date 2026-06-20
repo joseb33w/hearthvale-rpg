@@ -88,7 +88,7 @@
       "sun_color": [0.95, 0.98, 0.85],
       "sun_angle": [-48, -30],
       "wall_h": 8,
-      "enemies": 4,
+      "enemies": 6,
       "enemy_type": "minion",
       "enemy_ring": 8,
       "scatter": 70,
