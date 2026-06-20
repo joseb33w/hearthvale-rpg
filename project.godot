@@ -1,0 +1,30 @@
+; Godot 4.6.3 — Hearthvale (data-driven open-world RPG, streamed multi-area world).
+; Compatibility/WebGL2 + nothreads. Areas + their .glb stream from a CDN at runtime;
+; world.json/quests.json are loose files served next to index.html (NOT packed), so a
+; chat edit can rewrite them with no re-export.
+
+config_version=5
+
+[application]
+
+config/name="Hearthvale"
+run/main_scene="res://main.tscn"
+config/features=PackedStringArray("4.6", "GL Compatibility")
+
+[display]
+
+window/size/viewport_width=720
+window/size/viewport_height=1280
+window/stretch/mode="canvas_items"
+window/stretch/aspect="expand"
+
+[input_devices]
+
+pointing/emulate_mouse_from_touch=true
+
+[rendering]
+
+renderer/rendering_method="gl_compatibility"
+renderer/rendering_method.mobile="gl_compatibility"
+renderer/rendering_method.web="gl_compatibility"
+textures/vram_compression/import_etc2_astc=true
