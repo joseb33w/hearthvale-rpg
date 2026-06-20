@@ -62,11 +62,27 @@ func add_chest(pos: Vector3, contents: Array, gold := 0, model: Node = null) -> 
 		node.position = pos
 		node.rotation.y = randf() * TAU
 		area_parent.add_child(node)
+		_matte(node)
 	else:
 		node = _box(pos + Vector3(0, 0.45, 0), Vector3(0.9, 0.7, 0.9), Color(0.85, 0.68, 0.22))
 	var sparkle := _sparkle(pos + Vector3(0, 1.0, 0))
 	items.append({kind = "chest", pos = pos, node = node, sparkle = sparkle, label = "Open Chest",
 		contents = contents, gold = gold, opened = false})
+
+
+func _matte(root: Node3D) -> void:
+	# kill harsh metallic sky-specular so the chest reads as a solid prop, not a white glint
+	for mi: MeshInstance3D in root.find_children("*", "MeshInstance3D", true, false):
+		if mi.mesh == null:
+			continue
+		for s in range(max(1, mi.mesh.get_surface_count())):
+			var base: Material = mi.get_active_material(s)
+			var m := (base.duplicate() if base else StandardMaterial3D.new()) as StandardMaterial3D
+			if m == null:
+				continue
+			m.metallic = 0.0
+			m.roughness = maxf(m.roughness, 0.85)
+			mi.set_surface_override_material(s, m)
 
 
 func add_npc(pos: Vector3, npc_id: String, npc_name: String, persona: String, lines: Array, model: Node = null) -> void:
@@ -234,24 +250,24 @@ func _build_ui(hud: CanvasLayer) -> void:
 func _sparkle(pos: Vector3) -> CPUParticles3D:
 	var p := CPUParticles3D.new()
 	p.position = pos
-	p.amount = 14
-	p.lifetime = 1.3
+	p.amount = 10
+	p.lifetime = 1.2
 	p.emitting = true
 	p.direction = Vector3(0, 1, 0)
-	p.spread = 25.0
-	p.gravity = Vector3(0, 0.6, 0)
-	p.initial_velocity_min = 0.3
-	p.initial_velocity_max = 0.8
-	p.scale_amount_min = 0.05
-	p.scale_amount_max = 0.12
+	p.spread = 22.0
+	p.gravity = Vector3(0, 0.5, 0)
+	p.initial_velocity_min = 0.25
+	p.initial_velocity_max = 0.6
+	p.scale_amount_min = 0.04
+	p.scale_amount_max = 0.09
 	var m := StandardMaterial3D.new()
-	m.albedo_color = Color(1.0, 0.86, 0.3)
+	m.albedo_color = Color(1.0, 0.82, 0.32)
 	m.emission_enabled = true
-	m.emission = Color(1.0, 0.8, 0.25)
-	m.emission_energy_multiplier = 3.0
+	m.emission = Color(1.0, 0.74, 0.22)
+	m.emission_energy_multiplier = 1.3
 	p.mesh = SphereMesh.new()
-	(p.mesh as SphereMesh).radius = 0.06
-	(p.mesh as SphereMesh).height = 0.12
+	(p.mesh as SphereMesh).radius = 0.05
+	(p.mesh as SphereMesh).height = 0.1
 	p.material_override = m
 	area_parent.add_child(p)
 	return p

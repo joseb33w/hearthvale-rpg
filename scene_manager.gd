@@ -90,10 +90,11 @@ func _build_fade(hud: CanvasLayer) -> void:
 	_fade.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	hud.add_child(_fade)
 	_title = Label.new()
-	_title.set_anchors_preset(Control.PRESET_CENTER)
+	_title.set_anchors_preset(Control.PRESET_FULL_RECT)
 	_title.add_theme_font_size_override("font_size", 44)
 	_title.add_theme_color_override("font_color", Color(1, 1, 1))
 	_title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_title.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	_fade.add_child(_title)
 
 
