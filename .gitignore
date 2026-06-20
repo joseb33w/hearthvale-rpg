@@ -1,0 +1,19 @@
+# Godot
+.godot/
+/out/
+export_presets.cfg.bak
+*.uid
+
+# Downloaded toolchain (never commit the engine/templates)
+godot
+*.tpz
+*.tmp
+
+# Bundled assets — run ./fetch_assets.sh to download them (kept out of git)
+/models/*.glb
+/models/*.png
+/models/*.import
+
+# Local tooling (verification harness / playbooks) — never part of the game
+/verify/
+/playbooks/
