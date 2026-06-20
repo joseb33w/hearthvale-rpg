@@ -481,7 +481,7 @@ func _make_sky(path: String) -> Sky:
 func _build_player() -> void:
 	player = CharacterBody3D.new()
 	player.collision_layer = L_PLAYER
-	player.collision_mask = L_WORLD | L_ENEMY
+	player.collision_mask = L_WORLD | L_ENEMY | 16   # 16 = DECOR (foliage) so the player bumps it
 	add_child(player)
 	var cs := CollisionShape3D.new()
 	var cap := CapsuleShape3D.new()
@@ -581,6 +581,7 @@ func _build_hud() -> void:
 	stats.add_theme_color_override("font_color", Color(0.92, 1.0, 0.92))
 	stats.add_theme_color_override("font_outline_color", Color(0, 0, 0))
 	stats.add_theme_constant_override("outline_size", 6)
+	stats.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	hud_layer.add_child(stats)
 
 	hp_bg = ColorRect.new()
@@ -653,9 +654,10 @@ func _relayout() -> void:
 	var mr := maxf(16.0, float(insets.get("right", 0)))
 	var mb := maxf(20.0, float(insets.get("bottom", 0)))
 
-	stats.position = Vector2(ml, mt)
-	hp_bg.position = Vector2(ml, mt + 64)
+	hp_bg.position = Vector2(ml, mt)
 	hp_bar.position = hp_bg.position
+	stats.position = Vector2(ml, mt + 30)
+	stats.size.x = maxf(220.0, vp.x - ml - mr)
 
 	var jb := Vector2(ml + 30, vp.y - mb - 200)
 	joy_base.position = jb
