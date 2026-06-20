@@ -1,0 +1,16 @@
+{
+  "quests": [
+    {
+      "id": "recover_relics",
+      "name": "The Three Keys",
+      "giver": "elder",
+      "steps": [
+        { "id": "k1", "objective": { "type": "collect", "target": "forest_key" }, "desc": "Verdant Key (Forest)" },
+        { "id": "k2", "objective": { "type": "collect", "target": "cave_key" }, "desc": "Gloom Key (Cave)" },
+        { "id": "k3", "objective": { "type": "collect", "target": "peak_key" }, "desc": "Sky Key (Mountain Pass)" }
+      ],
+      "rewards": { "xp": 200, "gold": 150 },
+      "on_complete_flags": ["seal_broken"]
+    }
+  ]
+}
