@@ -284,7 +284,7 @@ func _portal(pos: Vector3, col: Color, open: bool) -> MeshInstance3D:
 	m.albedo_color = col
 	m.emission_enabled = true
 	m.emission = col
-	m.emission_energy_multiplier = 1.4 if open else 0.6
+	m.emission_energy_multiplier = 0.45 if open else 0.2
 	mi.material_override = m
 	body.add_child(mi)
 	area_parent.add_child(body)

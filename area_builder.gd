@@ -120,15 +120,31 @@ func build_area(rec: Dictionary, scene_parent: Node, player: Node3D, world_main:
 		if bool(kd.get("outline", false)):
 			apply_outline(m, 0.03)
 
-	# ---- 4. SCATTER dressing ----
+	# ---- 4. SCATTER dressing (kept clear of spawns/seams so foliage never walls a path) ----
+	var clear_pts: Array = []
+	for sp in (rec.get("spawns", {}) as Dictionary).values():
+		clear_pts.append(Vector3(float(sp[0]), 0.0, float(sp[2])))
+	for sm in rec.get("seams", []):
+		var spp = (sm as Dictionary).get("pos", [0, 0, 0])
+		clear_pts.append(Vector3(float(spp[0]), 0.0, float(spp[2])))
 	for u in chosen:
 		if not cache.has(u):
 			continue
 		var p := (cache[u] as Node).duplicate() as Node3D
 		root.add_child(p)
-		var ang := randf() * TAU
-		var rad := randf_range(size * 0.18, size - 1.5)
-		p.position = Vector3(cos(ang) * rad, 0.0, sin(ang) * rad)
+		var pos := Vector3.ZERO
+		for _try in range(10):
+			var ang := randf() * TAU
+			var rad := randf_range(size * 0.2, size - 1.5)
+			pos = Vector3(cos(ang) * rad, 0.0, sin(ang) * rad)
+			var ok := true
+			for cp in clear_pts:
+				if pos.distance_to(cp) < 5.0:
+					ok = false
+					break
+			if ok:
+				break
+		p.position = pos
 		p.rotation.y = randf() * TAU
 		var s := randf_range(0.8, 1.35)
 		p.scale = Vector3(s, s, s)
@@ -376,7 +392,7 @@ func _add_prop_collision(prop: Node3D, parent: Node) -> void:
 	if aabb.size.x < 0.18 and aabb.size.z < 0.18:
 		return
 	var body := StaticBody3D.new()
-	body.collision_layer = 1
+	body.collision_layer = 16   # DECOR layer: player bumps it, but the camera ray ignores it
 	var cs := CollisionShape3D.new()
 	var box := BoxShape3D.new()
 	box.size = Vector3(clamp(aabb.size.x, 0.2, 2.2), max(aabb.size.y, 0.4), clamp(aabb.size.z, 0.2, 2.2))
