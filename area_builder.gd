@@ -120,20 +120,36 @@ func build_area(rec: Dictionary, scene_parent: Node, player: Node3D, world_main:
 		if bool(kd.get("outline", false)):
 			apply_outline(m, 0.03)
 
-	# ---- 4. SCATTER dressing (kept clear of spawns/seams so foliage never walls a path) ----
+	# ---- 4. SCATTER dressing (kept clear of spawns/seams + the LANES between them so
+	#         foliage never walls the path from a spawn to a seam or the chest) ----
 	var clear_pts: Array = []
+	var spawn_pts: Array = []
 	for sp in (rec.get("spawns", {}) as Dictionary).values():
-		clear_pts.append(Vector3(float(sp[0]), 0.0, float(sp[2])))
+		var spv := Vector3(float(sp[0]), 0.0, float(sp[2]))
+		spawn_pts.append(spv)
+		clear_pts.append(spv)
+	var goal_pts: Array = []
 	for sm in rec.get("seams", []):
 		var spp = (sm as Dictionary).get("pos", [0, 0, 0])
-		clear_pts.append(Vector3(float(spp[0]), 0.0, float(spp[2])))
+		var smv := Vector3(float(spp[0]), 0.0, float(spp[2]))
+		goal_pts.append(smv)
+		clear_pts.append(smv)
+	if rec.has("chest"):
+		var cp = (rec.chest as Dictionary).get("pos", [0, 0, 0])
+		var chv := Vector3(float(cp[0]), 0.0, float(cp[2]))
+		goal_pts.append(chv)
+		clear_pts.append(chv)
+	var lanes: Array = []            # spawn -> (each seam + chest): keep a walkable corridor
+	for a in spawn_pts:
+		for b in goal_pts:
+			lanes.append([a, b])
 	for u in chosen:
 		if not cache.has(u):
 			continue
 		var p := (cache[u] as Node).duplicate() as Node3D
 		root.add_child(p)
 		var pos := Vector3.ZERO
-		for _try in range(10):
+		for _try in range(14):
 			var ang := randf() * TAU
 			var rad := randf_range(size * 0.2, size - 1.5)
 			pos = Vector3(cos(ang) * rad, 0.0, sin(ang) * rad)
@@ -142,6 +158,11 @@ func build_area(rec: Dictionary, scene_parent: Node, player: Node3D, world_main:
 				if pos.distance_to(cp) < 5.0:
 					ok = false
 					break
+			if ok:
+				for ln in lanes:
+					if _dist_to_seg(pos, ln[0], ln[1]) < 3.0:
+						ok = false
+						break
 			if ok:
 				break
 		p.position = pos
@@ -472,6 +493,15 @@ func _full(path: String) -> String:
 
 func _v3(a) -> Vector3:
 	return Vector3(a[0], a[1], a[2])
+
+
+func _dist_to_seg(p: Vector3, a: Vector3, b: Vector3) -> float:
+	var ab := b - a
+	var l2 := ab.length_squared()
+	if l2 < 0.0001:
+		return p.distance_to(a)
+	var t := clampf((p - a).dot(ab) / l2, 0.0, 1.0)
+	return p.distance_to(a + ab * t)
 
 
 func _mat(c: Color) -> StandardMaterial3D:
